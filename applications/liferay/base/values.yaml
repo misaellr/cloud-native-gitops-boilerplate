@@ -51,7 +51,6 @@ portalProperties: |
   proxy.forwarded.host.header=X-Forwarded-Host
   proxy.forwarded.proto.header=X-Forwarded-Proto
   web.server.display.node.port=false
-  web.server.forwarded.host.enabled=true
   web.server.forwarded.port.enabled=true
   web.server.forwarded.protocol.enabled=true
   web.server.http.port=80
@@ -74,4 +73,5 @@ volumeClaimTemplates:
         requests:
           storage: 20Gi
       storageClassName: gp2
+
 
