@@ -1,0 +1,10 @@
+volumeClaimTemplates:
+    -   metadata:
+            name: liferay-persistent-volume
+        spec:
+            accessModes:
+                -   ReadWriteOnce
+            resources:
+                requests:
+                    storage: 1Gi
+            storageClassName: "gp2"
