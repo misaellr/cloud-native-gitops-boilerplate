@@ -52,7 +52,7 @@ service:
   type: LoadBalancer
 volumeClaimTemplates:
   - metadata:
-    name: liferay-persistent-volume
+      name: liferay-persistent-volume
     spec:
       accessModes:
         - ReadWriteOnce
