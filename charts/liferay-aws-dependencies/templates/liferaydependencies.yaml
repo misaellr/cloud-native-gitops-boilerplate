@@ -1,6 +1,6 @@
 {{- if .Values.enabled -}}
 apiVersion: aws.liferay.com/v1alpha1
-kind: XLiferayDependencies
+kind: LiferayDependencies
 metadata:
   annotations:
     argocd.argoproj.io/sync-wave: {{ .Values.syncWave | default "-10" | quote }}
