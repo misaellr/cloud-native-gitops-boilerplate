@@ -43,7 +43,7 @@ spec:
                 allocatedStorage: {{ $spec.storageGB }}
                 autoGeneratePassword: true
                 engine: postgres
-                engineVersion: "16.11"
+                engineVersion: "16"
                 instanceClass: {{ $spec.instanceClass }}
                 passwordSecretRef:
                   key: password
