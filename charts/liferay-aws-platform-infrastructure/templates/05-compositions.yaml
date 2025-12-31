@@ -111,7 +111,7 @@ spec:
                 kind: ClusterProviderConfig
                 name: default
               writeConnectionSecretToRef:
-                name: liferay-database-{{ $slot }}-credentials
+                name: liferay-database-blue-credentials
 
             {{- $storageSlots := dict "blue" $xr.spec.storage.blue "green" $xr.spec.storage.green -}}
 
