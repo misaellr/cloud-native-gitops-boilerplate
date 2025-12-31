@@ -25,6 +25,7 @@ spec:
             {{- $databaseSlots := dict "blue" $xr.spec.database.blue "green" $xr.spec.database.green -}}
 
             {{- range $databaseSlot, $databaseSpec := $databaseSlots -}}
+            ---
             apiVersion: rds.aws.m.upbound.io/v1beta1
             kind: Instance
             metadata:
@@ -39,23 +40,22 @@ spec:
               namespace: {{ $xr.metadata.namespace }}
             spec:
               forProvider:
-                allocatedStorage: {{ $databaseSpec.storageGB }}
+                allocatedStorage: 20
                 autoGeneratePassword: true
                 engine: postgres
                 engineVersion: "16"
-                instanceClass: {{ $databaseSpec.instanceClass }}
+                instanceClass: db.t3.medium
                 passwordSecretRef:
                   key: password
                   name: liferay-database-{{ $databaseSlot }}-password
-                region: {{ $databaseSpec.region }}
+                region: "us-west-2"
                 skipFinalSnapshot: true
-                username: {{ $databaseSpec.username }}
+                username: liferay_database_admin
               providerConfigRef:
                 kind: ClusterProviderConfig
                 name: default
               writeConnectionSecretToRef:
                 name: liferay-database-{{ $databaseSlot }}-credentials
-            ---
             {{- end }}
 
             {{- $storageSlots := dict "blue" $xr.spec.storage.blue "green" $xr.spec.storage.green -}}
