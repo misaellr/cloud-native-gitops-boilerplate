@@ -57,6 +57,7 @@ spec:
     metadata:
       annotations:
         eks.amazonaws.com/role-arn: arn:aws:iam::{{ $accountId }}:role/{{ $cluster }}-provider-aws-rds-role
+      name: provider-aws-rds
 ---
 apiVersion: pkg.crossplane.io/v1beta1
 kind: DeploymentRuntimeConfig
@@ -87,3 +88,4 @@ spec:
     metadata:
       annotations:
         eks.amazonaws.com/role-arn: arn:aws:iam::{{ $accountId }}:role/{{ $cluster }}-provider-aws-s3-role
+      name: provider-aws-s3
