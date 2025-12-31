@@ -187,3 +187,6 @@ spec:
                     S3_BUCKET_REGION: {{ $storage.resource.spec.forProvider.region | toString }}
             {{- end }}
             `}}
+    - step: auto-detect-ready-composed-resources
+      functionRef:
+        name: function-auto-ready
