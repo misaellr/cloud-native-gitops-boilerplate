@@ -44,6 +44,7 @@ spec:
                 autoGeneratePassword: true
                 engine: postgres
                 engineVersion: "16.11"
+                identifier: {{ $xr.metadata.name }}-database-{{ $slot }}
                 instanceClass: {{ $spec.instanceClass }}
                 passwordSecretRef:
                   key: password
