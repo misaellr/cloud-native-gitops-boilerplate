@@ -52,9 +52,6 @@ spec:
                 region: {{ $spec.region }}
                 skipFinalSnapshot: true
                 username: {{ $spec.username }}
-              providerConfigRef:
-                kind: ClusterProviderConfig
-                name: default
               writeConnectionSecretToRef:
                 name: liferay-database-{{ $slot }}-credentials
             {{- end }}
