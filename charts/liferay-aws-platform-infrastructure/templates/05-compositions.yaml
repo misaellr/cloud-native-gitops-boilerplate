@@ -79,9 +79,9 @@ spec:
                 name: default
               writeConnectionSecretToRef:
                 name: liferay-database-{{ $slot }}-credentials
-            ---
             {{- end }}
 
+            ---
             apiVersion: rds.aws.m.upbound.io/v1beta1
             kind: Instance
             metadata:
