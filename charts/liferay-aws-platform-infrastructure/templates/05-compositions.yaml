@@ -25,7 +25,6 @@ spec:
             {{- $databaseSlots := dict "blue" $xr.spec.database.blue "green" $xr.spec.database.green -}}
 
             {{- range $databaseSlot, $databaseSpec := $databaseSlots -}}
-            ---
             apiVersion: rds.aws.m.upbound.io/v1beta1
             kind: Instance
             metadata:
@@ -56,6 +55,7 @@ spec:
                 name: default
               writeConnectionSecretToRef:
                 name: liferay-database-{{ $databaseSlot }}-credentials
+            ---
             {{- end }}
 
             {{- $storageSlots := dict "blue" $xr.spec.storage.blue "green" $xr.spec.storage.green -}}
