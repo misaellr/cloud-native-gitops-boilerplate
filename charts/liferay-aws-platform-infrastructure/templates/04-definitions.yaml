@@ -2,6 +2,7 @@ apiVersion: apiextensions.crossplane.io/v2
 kind: CompositeResourceDefinition
 metadata:
   annotations:
+    argocd.argoproj.io/sync-options: Replace=true
     argocd.argoproj.io/sync-wave: "-60"
   name: liferaydependencies.aws.liferay.com
 spec:
