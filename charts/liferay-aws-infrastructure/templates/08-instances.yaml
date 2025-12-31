@@ -6,11 +6,13 @@
 {{- $storage := .Values.storage | default dict -}}
 {{- $storageBlue := $storage.blue | default dict -}}
 {{- $storageGreen := $storage.green | default dict -}}
+
 apiVersion: aws.liferay.com/v1alpha1
 kind: LiferayDependencies
 metadata:
   annotations:
-    argocd.argoproj.io/sync-wave: {{ .Values.syncWave | default "-10" | quote }}
+    argocd.argoproj.io/sync-options: ServerSideApply=true
+    argocd.argoproj.io/sync-wave: "-20"
   name: {{ include "liferay-aws-infrastructure.fullname" . }}
   namespace: {{ .Release.Namespace }}
 spec:

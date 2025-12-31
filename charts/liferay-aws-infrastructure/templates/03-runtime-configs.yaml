@@ -1,0 +1,88 @@
+{{- $accountId := .Values.aws.accountId -}}
+{{- $cluster := .Values.aws.clusterName -}}
+
+apiVersion: pkg.crossplane.io/v1beta1
+kind: DeploymentRuntimeConfig
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-options: ServerSideApply=true
+    argocd.argoproj.io/sync-wave: "-70"
+  name: kubernetes-provider-config
+spec:
+  deploymentTemplate:
+    spec:
+      selector:
+        matchLabels:
+          pkg.crossplane.io/provider: provider-kubernetes
+      template:
+        metadata:
+          labels:
+            pkg.crossplane.io/provider: provider-kubernetes
+        spec:
+          containers:
+            - image: xpkg.upbound.io/upbound/provider-kubernetes:v1.2.0
+              name: package-runtime
+  serviceAccountTemplate:
+    metadata:
+      labels:
+        app.kubernetes.io/managed-by: liferay-infrastructure-chart
+---
+apiVersion: pkg.crossplane.io/v1beta1
+kind: DeploymentRuntimeConfig
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-options: ServerSideApply=true
+    argocd.argoproj.io/sync-wave: "-70"
+  name: aws-rds-config
+spec:
+  deploymentTemplate:
+    spec:
+      selector:
+        matchLabels:
+          pkg.crossplane.io/provider: provider-aws-rds
+      template:
+        metadata:
+          labels:
+            pkg.crossplane.io/provider: provider-aws-rds
+        spec:
+          containers:
+            - name: package-runtime
+              resources:
+                limits:
+                  memory: 1Gi
+                requests:
+                  memory: 512Mi
+  serviceAccountTemplate:
+    metadata:
+      annotations:
+        eks.amazonaws.com/role-arn: arn:aws:iam::{{ $accountId }}:role/{{ $cluster }}-provider-rds-role
+---
+apiVersion: pkg.crossplane.io/v1beta1
+kind: DeploymentRuntimeConfig
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-options: ServerSideApply=true
+    argocd.argoproj.io/sync-wave: "-70"
+  name: aws-s3-config
+spec:
+  deploymentTemplate:
+    spec:
+      selector:
+        matchLabels:
+          pkg.crossplane.io/provider: provider-aws-s3
+      template:
+        metadata:
+          labels:
+            pkg.crossplane.io/provider: provider-aws-s3
+        spec:
+          containers:
+            - name: package-runtime
+              resources:
+                limits:
+                  memory: 1Gi
+                requests:
+                  memory: 512Mi
+  serviceAccountTemplate:
+    metadata:
+      annotations:
+        eks.amazonaws.com/role-arn: arn:aws:iam::{{ $accountId }}:role/{{ $cluster }}-provider-s3-role

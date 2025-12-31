@@ -1,0 +1,181 @@
+{{- $accountId := .Values.aws.accountId -}}
+{{- $cluster := .Values.aws.clusterName -}}
+{{- $crossplaneNamespace := .Values.crossplaneNamespace | default "crossplane-system" -}}
+{{- $oidc := .Values.aws.oidcProvider -}}
+
+apiVersion: iam.aws.upbound.io/v1beta1
+kind: Policy
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-options: ServerSideApply=true
+    argocd.argoproj.io/sync-wave: "-80"
+  name: {{ $cluster }}-provider-rds-policy
+spec:
+  forProvider:
+    policy: |
+      {
+        "Version": "2012-10-17"
+        "Statement": [
+          {
+            "Effect": "Allow"
+            "Action": [
+              "rds:CreateDBInstance",
+              "rds:DeleteDBInstance",
+              "rds:ModifyDBInstance",
+              "rds:DescribeDBInstances",
+              "rds:ListTagsForResource",
+              "rds:AddTagsToResource",
+              "rds:CreateDBSubnetGroup",
+              "rds:DeleteDBSubnetGroup",
+              "rds:DescribeDBSubnetGroups",
+              "rds:DescribeDBParameters",
+              "rds:DescribeEngineDefaultParameters",
+            ],
+            "Resource": "*"
+          },
+          {
+            "Effect": "Allow",
+            "Action": [
+              "ec2:CreateSecurityGroup",
+              "ec2:DescribeSecurityGroups",
+              "ec2:AuthorizeSecurityGroupIngress",
+              "ec2:CreateTags"
+            ],
+            "Resource": "*"
+          }
+        ]
+      }
+
+---
+apiVersion: iam.aws.upbound.io/v1beta1
+kind: Role
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-options: ServerSideApply=true
+    argocd.argoproj.io/sync-wave: "-80"
+  name: {{ $cluster }}-provider-rds-role
+spec:
+  forProvider:
+    assumeRolePolicy: |
+      {
+        "Version": "2012-10-17",
+        "Statement": [{
+          "Effect": "Allow",
+          "Principal": { "Federated": "arn:aws:iam::{{ $accountId }}:oidc-provider/{{ $oidc }}" },
+          "Action": "sts:AssumeRoleWithWebIdentity",
+          "Condition": {
+            "StringLike": {
+              "{{ $oidc }}:sub": "system:serviceaccount:{{ $crossplaneNamespace }}:provider-aws-rds-*"
+            }
+          }
+        }]
+      }
+
+---
+apiVersion: iam.aws.upbound.io/v1beta1
+kind: RolePolicyAttachment
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-options: ServerSideApply=true
+    argocd.argoproj.io/sync-wave: "-80"
+  name: {{ $cluster }}-rds-attachment
+spec:
+  forProvider:
+    policyArnRef:
+      name: {{ $cluster }}-provider-rds-policy
+    roleRef:
+      name: {{ $cluster }}-provider-rds-role
+
+---
+apiVersion: iam.aws.upbound.io/v1beta1
+kind: Policy
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-options: ServerSideApply=true
+    argocd.argoproj.io/sync-wave: "-80"
+  name: {{ $cluster }}-provider-s3-policy
+spec:
+  forProvider:
+    policy: |
+      {
+        "Version": "2012-10-17",
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "s3:CreateBucket",
+              "s3:DeleteBucket",
+              "s3:ListBucket",
+              "s3:GetBucketLocation",
+              "s3:GetBucketTagging",
+              "s3:PutBucketTagging",
+              "s3:GetBucketAcl",
+              "s3:PutBucketAcl",
+              "s3:GetBucketPolicy",
+              "s3:PutBucketPolicy",
+              "s3:GetBucketCORS",
+              "s3:PutBucketCORS",
+              "s3:GetBucketWebsite",
+              "s3:PutBucketWebsite",
+              "s3:GetBucketVersioning",
+              "s3:PutBucketVersioning",
+              "s3:GetAccelerateConfiguration",
+              "s3:GetLifecycleConfiguration",
+              "s3:GetReplicationConfiguration",
+              "s3:GetEncryptionConfiguration",
+              "s3:PutEncryptionConfiguration",
+              "s3:GetBucketPublicAccessBlock",
+              "s3:PutBucketPublicAccessBlock",
+              "s3:GetBucketRequestPayment",
+              "s3:GetBucketLogging",
+              "s3:GetBucketObjectLockConfiguration"
+            ],
+            "Resource": ["arn:aws:s3:::liferay-*"]
+          },
+          {
+            "Effect": "Allow",
+            "Action": ["s3:PutObject", "s3:GetObject", "s3:DeleteObject"],
+            "Resource": ["arn:aws:s3:::liferay-*/*"]
+          }
+        ]
+      }
+
+---
+apiVersion: iam.aws.upbound.io/v1beta1
+kind: Role
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-options: ServerSideApply=true
+    argocd.argoproj.io/sync-wave: "-80"
+  name: {{ $cluster }}-provider-s3-role
+spec:
+  forProvider:
+    assumeRolePolicy: |
+      {
+        "Version": "2012-10-17",
+        "Statement": [{
+          "Effect": "Allow",
+          "Principal": { "Federated": "arn:aws:iam::{{ $accountId }}:oidc-provider/{{ $oidc }}" },
+          "Action": "sts:AssumeRoleWithWebIdentity",
+          "Condition": {
+            "StringLike": {
+              "{{ $oidc }}:sub": "system:serviceaccount:{{ $crossplaneNamespace }}:provider-aws-s3-*"
+            }
+          }
+        }]
+      }
+
+---
+apiVersion: iam.aws.upbound.io/v1beta1
+kind: RolePolicyAttachment
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-options: ServerSideApply=true
+    argocd.argoproj.io/sync-wave: "-80"
+  name: {{ $cluster }}-s3-attachment
+spec:
+  forProvider:
+    policyArnRef:
+      name: {{ $cluster }}-provider-s3-policy
+    roleRef:
+      name: {{ $cluster }}-provider-s3-role

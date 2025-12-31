@@ -1,0 +1,162 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-options: ServerSideApply=true
+    argocd.argoproj.io/sync-wave: "-40"
+  name: liferay-aws-infrastructure.aws.liferay.com
+spec:
+  compositeTypeRef:
+    apiVersion: aws.liferay.com/v1alpha1
+    kind: LiferayDependencies
+  mode: Pipeline
+  pipeline:
+    - step: liferay-infrastructure
+      functionRef:
+        name: function-go-templating
+      input:
+        apiVersion: template.fn.crossplane.io/v1beta1
+        kind: GoTemplate
+        source: Inline
+        inline:
+          template: |
+            {{`
+            {{- $xr := .observed.composite.resource -}}
+
+            {{- $databaseSlots := dict "blue" $xr.spec.database.blue "green" $xr.spec.database.green -}}
+
+            {{- range $slot, $spec := $databaseSlots -}}
+            ---
+            apiVersion: rds.aws.m.upbound.io/v1beta1
+            kind: Instance
+            metadata:
+              annotations:
+                crossplane.io/external-name: {{ $xr.metadata.name }}-database-{{ $slot }}
+                gotemplating.fn.crossplane.io/composition-resource-name: database-{{ $slot }}
+              labels:
+                app: liferay
+                component: database
+                slot: {{ $slot }}
+              name: {{ $xr.metadata.name }}-database-{{ $slot }}
+              namespace: {{ $xr.metadata.namespace }}
+            spec:
+              forProvider:
+                allocatedStorage: {{ $spec.storageGB }}
+                autoGeneratePassword: true
+                engine: postgres
+                engineVersion: "16.11"
+                instanceClass: {{ $spec.instanceClass }}
+                passwordSecretRef:
+                  key: password
+                  name: liferay-database-{{ $slot }}-password
+                region: {{ $spec.region }}
+                skipFinalSnapshot: true
+                username: {{ $spec.username }}
+              writeConnectionSecretToRef:
+                name: liferay-database-{{ $slot }}-credentials
+            {{- end }}
+
+            {{- $storageSlots := dict "blue" $xr.spec.storage.blue "green" $xr.spec.storage.green -}}
+
+            {{- range $slot, $spec := $storageSlots -}}
+            ---
+            apiVersion: s3.aws.m.upbound.io/v1beta1
+            kind: Bucket
+            metadata:
+              annotations:
+                crossplane.io/external-name: {{ $xr.metadata.name }}-storage-{{ $slot }}
+                gotemplating.fn.crossplane.io/composition-resource-name: storage-{{ $slot }}
+              labels:
+                app: liferay
+                component: storage
+                slot: {{ $slot }}
+              name: {{ $xr.metadata.name }}-storage-{{ $slot }}
+              namespace: {{ $xr.metadata.namespace }}
+            spec:
+              forProvider:
+                region: {{ $spec.region }}
+            ---
+            apiVersion: s3.aws.m.upbound.io/v1beta1
+            kind: BucketVersioning
+            metadata:
+              annotations:
+                crossplane.io/external-name: {{ $xr.metadata.name }}-storage-versioning-{{ $slot }}
+              labels:
+                app: liferay
+                component: storage
+                slot: {{ $slot }}
+              name: {{ $xr.metadata.name }}-storage-versioning-{{ $slot }}
+              namespace: {{ $xr.metadata.namespace }}
+            spec:
+              forProvider:
+                bucketSelector:
+                  matchLabels:
+                    app: liferay
+                    component: storage
+                    slot: {{ $slot }}
+                  namespace: {{ $xr.metadata.namespace }}
+                region: {{ $spec.region }}
+                versioningConfiguration:
+                  status: Enabled
+            {{- end }}
+            `}}
+    - step: managed-service-details-secret
+      functionRef:
+        name: function-go-templating
+      input:
+        apiVersion: template.fn.crossplane.io/v1beta1
+        kind: GoTemplate
+        source: Inline
+        inline:
+          template: |
+            {{`
+            {{- $xr := .observed.composite.resource -}}
+            {{- $databaseResourceName := printf "database-%s" $xr.spec.database.activeSlot -}}
+            {{- $storageResourceName := printf "storage-%s" $xr.spec.storage.activeSlot -}}
+
+            {{- $database := "" -}}
+            {{- $storage := "" -}}
+
+            {{- range $name, $res := .observed.resources }}
+              {{- if eq $name $databaseResourceName }}{{ $database = $res }}{{ end }}
+              {{- if eq $name $storageResourceName }}{{ $storage = $res }}{{ end }}
+            {{- end }}
+
+            {{- $databaseAddress := "" -}}
+            {{- if $database.resource -}}
+              {{- if $database.resource.status -}}
+                {{- if $database.resource.status.atProvider -}}
+                  {{- $databaseAddress = $database.resource.status.atProvider.address -}}
+                {{- end -}}
+              {{- end -}}
+            {{- end -}}
+
+            {{- $storageName := "" -}}
+            {{- if $storage.resource -}}
+              {{- if $storage.resource.metadata -}}
+                {{- if $storage.resource.metadata.annotations -}}
+                  {{- $storageName = index $storage.resource.metadata.annotations "crossplane.io/external-name" -}}
+                {{- end -}}
+              {{- end -}}
+            {{- end -}}
+
+            {{- if and $databaseAddress $storageName }}
+            ---
+            apiVersion: v1
+            kind: Secret
+            metadata:
+              name: managed-service-details
+              namespace: {{ $xr.metadata.namespace }}
+            type: Opaque
+            stringData:
+              DATABASE_ENDPOINT: {{ $databaseAddress | toString }}
+              DATABASE_PASSWORD: {{ $database.connectionDetails.password | default "" | toString }}
+              DATABASE_PORT: "{{ $database.resource.status.atProvider.port | default 5432 }}"
+              DATABASE_USERNAME: {{ $database.resource.spec.forProvider.username | toString }}
+              OPENSEARCH_ENDPOINT: ""
+              OPENSEARCH_PASSWORD: ""
+              OPENSEARCH_USERNAME: ""
+              S3_BUCKET_ID: {{ $storageName | toString }}
+              S3_BUCKET_REGION: {{ $storage.resource.spec.forProvider.region | toString }}
+            {{- end }}
+            `}}
