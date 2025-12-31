@@ -24,6 +24,9 @@ spec:
             apiVersion: v1
             kind: ConfigMap
             metadata:
+              annotations:
+                crossplane.io/external-name: debug-cm
+                gotemplating.fn.crossplane.io/composition-resource-name: debug-cm
               name: debug-crossplane-context
               namespace: liferay-dev
             data:
