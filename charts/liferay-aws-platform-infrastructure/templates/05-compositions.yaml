@@ -10,6 +10,27 @@ spec:
     kind: LiferayDependencies
   mode: Pipeline
   pipeline:
+    - step: debug-pipeline
+      functionRef:
+        name: function-go-templating
+      input:
+        apiVersion: template.fn.crossplane.io/v1beta1
+        kind: GoTemplate
+        source: Inline
+        inline:
+          template: |
+            {{`
+            ---
+            apiVersion: v1
+            kind: ConfigMap
+            metadata:
+              name: debug-crossplane-context
+              namespace: liferay-dev
+            data:
+              # This will show you exactly what the function sees in the spec
+              xr-spec: |
+                {{ .observed.composite.resource.spec | toYaml | indent 16 }}
+            `}}
     - step: liferay-infrastructure
       functionRef:
         name: function-go-templating
