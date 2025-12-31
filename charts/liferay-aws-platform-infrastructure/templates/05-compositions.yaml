@@ -24,71 +24,71 @@ spec:
 
             {{- $databaseSlots := dict "blue" $xr.spec.database.blue "green" $xr.spec.database.green -}}
 
-            {{- range $databaseSlot, $databaseSpec := $databaseSlots }}
+            {{- range $slot, $spec := $databaseSlots }}
             ---
             apiVersion: rds.aws.m.upbound.io/v1beta1
             kind: Instance
             metadata:
               annotations:
-                crossplane.io/external-name: {{ $xr.metadata.name }}-database-{{ $databaseSlot }}
-                gotemplating.fn.crossplane.io/composition-resource-name: database-{{ $databaseSlot }}
+                crossplane.io/external-name: {{ $xr.metadata.name }}-database-{{ $slot }}
+                gotemplating.fn.crossplane.io/composition-resource-name: database-{{ $slot }}
               labels:
                 app: liferay
                 component: database
-                slot: {{ $databaseSlot }}
-              name: {{ $xr.metadata.name }}-database-{{ $databaseSlot }}
+                slot: {{ $slot }}
+              name: {{ $xr.metadata.name }}-database-{{ $slot }}
               namespace: {{ $xr.metadata.namespace }}
             spec:
               forProvider:
-                allocatedStorage: 20
+                allocatedStorage: {{ $spec.storageGB }}
                 autoGeneratePassword: true
                 engine: postgres
                 engineVersion: "16.11"
-                instanceClass: "db.t3.medium"
+                instanceClass: {{ $spec.instanceClass }}
                 passwordSecretRef:
                   key: password
-                  name: liferay-database-{{ $databaseSlot }}-password
-                region: "us-west-2"
+                  name: liferay-database-{{ $slot }}-password
+                region: {{ $spec.region }}
                 skipFinalSnapshot: true
-                username: "liferay_database_admin"
+                username: {{ $spec.username }}
               providerConfigRef:
                 kind: ClusterProviderConfig
                 name: default
               writeConnectionSecretToRef:
-                name: liferay-database-{{ $databaseSlot }}-credentials
+                name: liferay-database-{{ $slot }}-credentials
             {{- end }}
 
             {{- $storageSlots := dict "blue" $xr.spec.storage.blue "green" $xr.spec.storage.green -}}
 
-            {{- range $storageSlot, $storageSpec := $storageSlots }}
+            {{- range $slot, $spec := $storageSlots }}
             ---
             apiVersion: s3.aws.m.upbound.io/v1beta1
             kind: Bucket
             metadata:
               annotations:
-                crossplane.io/external-name: {{ $xr.metadata.name }}-storage-{{ $storageSlot }}
-                gotemplating.fn.crossplane.io/composition-resource-name: storage-{{ $storageSlot }}
+                crossplane.io/external-name: {{ $xr.metadata.name }}-storage-{{ $slot }}
+                gotemplating.fn.crossplane.io/composition-resource-name: storage-{{ $slot }}
               labels:
                 app: liferay
                 component: storage
-                slot: {{ $storageSlot }}
-              name: {{ $xr.metadata.name }}-storage-{{ $storageSlot }}
+                slot: {{ $slot }}
+              name: {{ $xr.metadata.name }}-storage-{{ $slot }}
               namespace: {{ $xr.metadata.namespace }}
             spec:
               forProvider:
-                region: {{ $storageSpec.region }}
+                region: {{ $spec.region }}
             ---
             apiVersion: s3.aws.m.upbound.io/v1beta1
             kind: BucketVersioning
             metadata:
               annotations:
-                crossplane.io/external-name: {{ $xr.metadata.name }}-storage-versioning-{{ $storageSlot }}
-                gotemplating.fn.crossplane.io/composition-resource-name: storage-versioning-{{ $storageSlot }}
+                crossplane.io/external-name: {{ $xr.metadata.name }}-storage-versioning-{{ $slot }}
+                gotemplating.fn.crossplane.io/composition-resource-name: storage-versioning-{{ $slot }}
               labels:
                 app: liferay
                 component: storage
-                slot: {{ $storageSlot }}
-              name: {{ $xr.metadata.name }}-storage-versioning-{{ $storageSlot }}
+                slot: {{ $slot }}
+              name: {{ $xr.metadata.name }}-storage-versioning-{{ $slot }}
               namespace: {{ $xr.metadata.namespace }}
             spec:
               forProvider:
@@ -96,9 +96,9 @@ spec:
                   matchLabels:
                     app: liferay
                     component: storage
-                    slot: {{ $storageSlot }}
+                    slot: {{ $slot }}
                   namespace: {{ $xr.metadata.namespace }}
-                region: {{ $storageSpec.region }}
+                region: {{ $spec.region }}
                 versioningConfiguration:
                   status: Enabled
             {{- end }}
