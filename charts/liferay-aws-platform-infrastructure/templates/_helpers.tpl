@@ -1,4 +1,4 @@
-{{- define "liferay-aws-infrastructure.fullname" -}}
+{{- define "liferay-aws-platform-infrastructure.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -11,6 +11,6 @@
 {{- end }}
 {{- end }}
 
-{{- define "liferay-aws-infrastructure.name" -}}
+{{- define "liferay-aws-platform-infrastructure.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}

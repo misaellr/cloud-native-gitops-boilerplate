@@ -29,7 +29,7 @@ spec:
               "rds:DeleteDBSubnetGroup",
               "rds:DescribeDBSubnetGroups",
               "rds:DescribeDBParameters",
-              "rds:DescribeEngineDefaultParameters",
+              "rds:DescribeEngineDefaultParameters"
             ],
             "Resource": "*"
           },
