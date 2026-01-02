@@ -409,12 +409,12 @@ spec:
       functionRef:
         name: function-tag-manager
       input:
-        apiVersion: tag.fn.crossplane.io/v1beta1
-        kind: TagResources
-        spec:
-          tags:
-            - key: DeploymentName
-              value: {{ .Values.deploymentName }}
+        addTags:
+          - tags:
+              DeploymentName: {{ .Values.deploymentName }}
+          - type: FromValue
+        apiVersion: tag-manager.fn.crossplane.io/v1beta1
+        kind: ManagedTags
     - step: auto-detect-ready-composed-resources
       functionRef:
         name: function-auto-ready
