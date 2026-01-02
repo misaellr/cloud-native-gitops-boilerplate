@@ -76,6 +76,7 @@ spec:
               annotations:
                 crossplane.io/external-name: {{ $xr.metadata.name }}-database-security-group-{{ $slot }}
                 gotemplating.fn.crossplane.io/composition-resource-name: database-security-group-{{ $slot }}
+              name: {{ $xr.metadata.name }}-database-security-group-{{ $slot }}
             spec:
               forProvider:
                 name: {{ $xr.metadata.name }}-database-security-group-{{ $slot }}
@@ -89,6 +90,7 @@ spec:
               annotations:
                 crossplane.io/external-name: {{ $xr.metadata.name }}-database-security-group-ingress-{{ $slot }}
                 gotemplating.fn.crossplane.io/composition-resource-name: database-security-group-ingress-{{ $slot }}
+              name: {{ $xr.metadata.name }}-database-security-group-ingress-{{ $slot }}
             spec:
               forProvider:
                 fromPort: 5432
@@ -104,6 +106,7 @@ spec:
               annotations:
                 crossplane.io/external-name: {{ $xr.metadata.name }}-database-subnet-group-{{ $slot }}
                 gotemplating.fn.crossplane.io/composition-resource-name: database-subnet-group-{{ $slot }}
+              name: {{ $xr.metadata.name }}-database-subnet-group-{{ $slot }}
             spec:
               forProvider:
                 region: {{ $spec.region }}
@@ -167,9 +170,9 @@ spec:
               annotations:
                 crossplane.io/external-name: {{ $xr.metadata.name }}-storage-policy-{{ $slot }}
                 gotemplating.fn.crossplane.io/composition-resource-name: storage-policy-{{ $slot }}
+              name: {{ $xr.metadata.name }}-storage-policy-{{ $slot }}
             spec:
               forProvider:
-                name: {{ $xr.metadata.name }}-storage-{{ $slot }}
                 policy: |
                   {
                     "Statement": [
@@ -196,6 +199,7 @@ spec:
               annotations:
                 crossplane.io/external-name: {{ $xr.metadata.name }}-storage-policy-attachment-{{ $slot }}
                 gotemplating.fn.crossplane.io/composition-resource-name: storage-policy-attachment-{{ $slot }}
+              name: {{ $xr.metadata.name }}-storage-policy-attachment-{{ $slot }}
             spec:
               forProvider:
                 policyArnSelector:
@@ -262,6 +266,7 @@ spec:
               annotations:
                 crossplane.io/external-name: {{ $xr.metadata.name }}-search-policy
                 gotemplating.fn.crossplane.io/composition-resource-name: search-policy
+              name: {{ $xr.metadata.name }}-search-policy
             spec:
               forProvider:
                 domainNameSelector:
@@ -288,6 +293,7 @@ spec:
               annotations:
                 crossplane.io/external-name: {{ $xr.metadata.name }}-search-security-group
                 gotemplating.fn.crossplane.io/composition-resource-name: search-security-group
+              name: {{ $xr.metadata.name }}-search-security-group
             spec:
               forProvider:
                 name: {{ $xr.metadata.name }}-search-security-group
@@ -301,6 +307,7 @@ spec:
               annotations:
                 crossplane.io/external-name: {{ $xr.metadata.name }}-search-security-group-ingress
                 gotemplating.fn.crossplane.io/composition-resource-name: search-security-group-ingress
+              name: {{ $xr.metadata.name }}-search-security-group-ingress
             spec:
               forProvider:
                 fromPort: 443
