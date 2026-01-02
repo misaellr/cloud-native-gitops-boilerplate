@@ -51,7 +51,10 @@ spec:
                 allocatedStorage: {{ $spec.storageGB }}
                 autoGeneratePassword: true
                 dbSubnetGroupNameSelector:
-                  matchControllerRef: true
+                  matchLabels:
+                    app: liferay
+                    component: database-subnet-group
+                    slot: {{ $slot }}
                 engine: postgres
                 engineVersion: "16.11"
                 identifier: {{ $xr.metadata.name }}-database-{{ $slot }}
@@ -63,7 +66,10 @@ spec:
                 skipFinalSnapshot: true
                 username: {{ $spec.username }}
                 vpcSecurityGroupIdSelector:
-                  matchControllerRef: true
+                  matchLabels:
+                    app: liferay
+                    component: database-security-group
+                    slot: {{ $slot }}
                 tags:
                   Active: {{ printf "%t" (eq $slot $databaseSpec.activeSlot) }}
                   Backup: true
@@ -77,6 +83,10 @@ spec:
               annotations:
                 crossplane.io/external-name: {{ $xr.metadata.name }}-database-security-group-{{ $slot }}
                 gotemplating.fn.crossplane.io/composition-resource-name: database-security-group-{{ $slot }}
+              labels:
+                app: liferay
+                component: database-security-group
+                slot: {{ $slot }}
               name: {{ $xr.metadata.name }}-database-security-group-{{ $slot }}
             spec:
               forProvider:
@@ -91,6 +101,10 @@ spec:
               annotations:
                 crossplane.io/external-name: {{ $xr.metadata.name }}-database-security-group-ingress-{{ $slot }}
                 gotemplating.fn.crossplane.io/composition-resource-name: database-security-group-ingress-{{ $slot }}
+              labels:
+                app: liferay
+                component: database-security-group-ingress
+                slot: {{ $slot }}
               name: {{ $xr.metadata.name }}-database-security-group-ingress-{{ $slot }}
             spec:
               forProvider:
@@ -99,7 +113,10 @@ spec:
                 toPort: 5432
                 referencedSecurityGroupId: {{ $nodesSecurityGroupId }}
                 securityGroupIdSelector:
-                  matchControllerRef: true
+                  matchLabels:
+                    app: liferay
+                    component: database-security-group
+                    slot: {{ $slot }}
             ---
             apiVersion: rds.aws.m.upbound.io/v1beta1
             kind: SubnetGroup
@@ -107,6 +124,10 @@ spec:
               annotations:
                 crossplane.io/external-name: {{ $xr.metadata.name }}-database-subnet-group-{{ $slot }}
                 gotemplating.fn.crossplane.io/composition-resource-name: database-subnet-group-{{ $slot }}
+              labels:
+                app: liferay
+                component: database-subnet-group
+                slot: {{ $slot }}
               name: {{ $xr.metadata.name }}-database-subnet-group-{{ $slot }}
             spec:
               forProvider:
@@ -149,7 +170,7 @@ spec:
                 gotemplating.fn.crossplane.io/composition-resource-name: storage-versioning-{{ $slot }}
               labels:
                 app: liferay
-                component: storage
+                component: storage-versioning
                 slot: {{ $slot }}
               name: {{ $xr.metadata.name }}-storage-versioning-{{ $slot }}
               namespace: {{ $xr.metadata.namespace }}
@@ -171,6 +192,10 @@ spec:
               annotations:
                 crossplane.io/external-name: {{ $xr.metadata.name }}-storage-policy-{{ $slot }}
                 gotemplating.fn.crossplane.io/composition-resource-name: storage-policy-{{ $slot }}
+              labels:
+                app: liferay
+                component: storage-policy
+                slot: {{ $slot }}
               name: {{ $xr.metadata.name }}-storage-policy-{{ $slot }}
             spec:
               forProvider:
@@ -200,12 +225,18 @@ spec:
               annotations:
                 crossplane.io/external-name: {{ $xr.metadata.name }}-storage-policy-attachment-{{ $slot }}
                 gotemplating.fn.crossplane.io/composition-resource-name: storage-policy-attachment-{{ $slot }}
+              labels:
+                app: liferay
+                component: storage-policy-attachment
+                slot: {{ $slot }}
               name: {{ $xr.metadata.name }}-storage-policy-attachment-{{ $slot }}
             spec:
               forProvider:
                 policyArnSelector:
                   matchLabels:
-                    gotemplating.fn.crossplane.io/composition-resource-name: storage-policy-{{ $slot }}
+                    app: liferay
+                    component: storage-policy
+                    slot: {{ $slot }}
                 role: {{ $liferayServiceAccountRoleName }}
             {{- end }}
 
@@ -256,7 +287,9 @@ spec:
                   Name: {{ $xr.metadata.name }}-search
                 vpcOptions:
                   securityGroupIdSelector:
-                    matchControllerRef: true
+                    matchLabels:
+                      app: liferay
+                      component: search-security-group
                   subnetIds: {{ slice $privateSubnetIdsList 0 2 | toJson }}
               writeConnectionSecretToRef:
                 name: liferay-search-credentials
@@ -267,11 +300,16 @@ spec:
               annotations:
                 crossplane.io/external-name: {{ $xr.metadata.name }}-search-policy
                 gotemplating.fn.crossplane.io/composition-resource-name: search-policy
+              labels:
+                app: liferay
+                component: search-policy
               name: {{ $xr.metadata.name }}-search-policy
             spec:
               forProvider:
                 domainNameSelector:
-                  matchControllerRef: true
+                  matchLabels:
+                    app: liferay
+                    component: search
                 region: {{ $searchSpec.region }}
                 accessPolicies: |
                   {
@@ -294,6 +332,9 @@ spec:
               annotations:
                 crossplane.io/external-name: {{ $xr.metadata.name }}-search-security-group
                 gotemplating.fn.crossplane.io/composition-resource-name: search-security-group
+              labels:
+                app: liferay
+                component: search-security-group
               name: {{ $xr.metadata.name }}-search-security-group
             spec:
               forProvider:
@@ -308,6 +349,9 @@ spec:
               annotations:
                 crossplane.io/external-name: {{ $xr.metadata.name }}-search-security-group-ingress
                 gotemplating.fn.crossplane.io/composition-resource-name: search-security-group-ingress
+              labels:
+                app: liferay
+                component: search-security-group-ingress
               name: {{ $xr.metadata.name }}-search-security-group-ingress
             spec:
               forProvider:
@@ -316,7 +360,9 @@ spec:
                 toPort: 443
                 referencedSecurityGroupId: {{ $nodesSecurityGroupId }}
                 securityGroupIdSelector:
-                  matchControllerRef: true
+                  matchLabels:
+                    app: liferay
+                    component: search-security-group
             `}}
     - step: managed-service-details-secret
       functionRef:
@@ -390,6 +436,9 @@ spec:
               annotations:
                 crossplane.io/external-name: {{ $xr.metadata.name }}-managed-service-details-secret
                 gotemplating.fn.crossplane.io/composition-resource-name: managed-service-details-secret
+              labels:
+                app: liferay
+                component: managed-service-details-secret
               name: {{ $xr.metadata.name }}-managed-service-details-secret
               namespace: {{ $xr.metadata.namespace }}
             spec:
