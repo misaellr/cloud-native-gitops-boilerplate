@@ -207,7 +207,7 @@ spec:
             {{- $searchSpec := $xr.spec.search }}
 
             ---
-            apiVersion: opensearchservice.aws.m.upbound.io/v1beta1
+            apiVersion: opensearch.aws.m.upbound.io/v1beta1
             kind: Domain
             metadata:
               annotations:
@@ -256,7 +256,7 @@ spec:
               writeConnectionSecretToRef:
                 name: liferay-search-credentials
             ---
-            apiVersion: opensearchservice.aws.m.upbound.io/v1beta1
+            apiVersion: opensearch.aws.m.upbound.io/v1beta1
             kind: DomainPolicy
             metadata:
               annotations:
