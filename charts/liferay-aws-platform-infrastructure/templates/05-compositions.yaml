@@ -23,8 +23,8 @@ spec:
             {{ $accountId := "`}}{{ .Values.aws.accountId }}{{`" }}
             {{ $liferayServiceAccountRoleName := "`}}{{ .Values.liferayServiceAccountRoleName }}{{`" }}
             {{ $nodesSecurityGroupId := "`}}{{ .Values.aws.nodesSecurityGroupId }}{{`" }}
-            {{ $privateSubnetIds := "`}}{{ .Values.aws.privateSubnetIds | toJson }}{{`" }}
             {{ $vpcId := "`}}{{ .Values.aws.vpcId }}{{`" }}
+            {{ $privateSubnetIds := {{ printf "%q" (.Values.aws.privateSubnetIds | toJson) }} }}
             {{- $privateSubnetIdsList := $privateSubnetIds | fromJson -}}
             {{- $xr := .observed.composite.resource -}}
 
