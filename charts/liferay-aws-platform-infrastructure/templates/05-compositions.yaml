@@ -48,6 +48,7 @@ spec:
               namespace: {{ $xr.metadata.namespace }}
             spec:
               forProvider:
+                managementPolicies: ["Observe"]
                 allocatedStorage: {{ $spec.storageGB }}
                 autoGeneratePassword: true
                 dbSubnetGroupNameSelector:
