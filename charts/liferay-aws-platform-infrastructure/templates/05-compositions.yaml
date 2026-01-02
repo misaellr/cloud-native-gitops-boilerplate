@@ -25,13 +25,12 @@ spec:
             {{- $nodesSecurityGroupId := .Values.aws.nodesSecurityGroupId -}}
             {{- $privateSubnetIds := .Values.aws.privateSubnetIds -}}
             {{- $vpcId := .Values.aws.vpcId -}}
+            {{`{{- $accountId := `}}{{ $accountId }}{{` -}}`}}
+            {{`{{- $nodesSecurityGroupId := `}}{{ $nodesSecurityGroupId }}{{` -}}`}}
+            {{`{{- $vpcId := `}}{{ $vpcId }}{{` -}}`}}
+            {{`{{- $privateSubnetIds := `}}{{ $privateSubnetIds }}{{` -}}`}}
+            {{`{{- $liferayServiceAccountRoleName := `}}{{ $liferayServiceAccountRoleName }}{{` -}}`}}
             {{`
-            {{- $accountId := "`}}{{ $accountId }}{{`" -}}
-            {{- $nodesSecurityGroupId := "`}}{{ $nodesSecurityGroupId }}{{`" -}}
-            {{- $vpcId := "`}}{{ $vpcId }}{{`" -}}
-            {{- $privateSubnetIds := "`}}{{ $privateSubnetIds }}{{`" -}}
-            {{- $liferayServiceAccountRoleName := "`}}{{ $liferayServiceAccountRoleName }}{{`" -}}
-
             {{- $privateSubnetIdsList := $privateSubnetIds | fromJson -}}
             {{- $xr := .observed.composite.resource -}}
 
