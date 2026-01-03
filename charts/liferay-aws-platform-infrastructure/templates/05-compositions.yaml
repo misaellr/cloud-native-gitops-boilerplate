@@ -343,7 +343,7 @@ spec:
                   terraform {
                     required_providers {
                       random={
-                        source="hashicorp/random"
+                        source="registry.opentofu.org/hashicorp/random"
                         version = "~> 3.0"
                       }
                     }
