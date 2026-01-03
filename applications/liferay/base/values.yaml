@@ -65,7 +65,9 @@ liferay-default:
       cpu: 2000m
       memory: 4Gi
   volumeClaimTemplates:
-    - metadata:
+    - apiVersion: v1	
+      kind: PersistentVolumeClaim	
+      metadata:
         name: liferay-persistent-volume
       spec:
         accessModes:
