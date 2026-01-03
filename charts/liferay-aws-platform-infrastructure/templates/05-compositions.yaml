@@ -243,22 +243,23 @@ spec:
             {{- end }}
 
             {{- $searchSpec := $xr.spec.search }}
+            {{- $searchName := printf "%.20s-search" $xr.metadata.name -}}
 
             ---
             apiVersion: opensearch.aws.m.upbound.io/v1beta1
             kind: Domain
             metadata:
               annotations:
-                crossplane.io/external-name: {{ $xr.metadata.name }}-search
+                crossplane.io/external-name: {{ $searchName }}
                 gotemplating.fn.crossplane.io/composition-resource-name: search
               labels:
                 app: liferay
                 component: search
-              name: {{ $xr.metadata.name }}-search
+              name: {{ $searchName }}
               namespace: {{ $xr.metadata.namespace }}
             spec:
               forProvider:
-                domainName: {{ $xr.metadata.name }}-search
+                domainName: {{ $searchName }}
                 region: {{ $searchSpec.region }}
                 engineVersion: {{ $searchSpec.engineVersion }}
                 clusterConfig:
@@ -287,7 +288,7 @@ spec:
                   enforceHttps: true
                   tlsSecurityPolicy: Policy-Min-TLS-1-2-2019-07
                 tags:
-                  Name: {{ $xr.metadata.name }}-search
+                  Name: {{ $searchName }}
                 vpcOptions:
                   securityGroupIdSelector:
                     matchLabels:
@@ -301,12 +302,12 @@ spec:
             kind: DomainPolicy
             metadata:
               annotations:
-                crossplane.io/external-name: {{ $xr.metadata.name }}-search-policy
+                crossplane.io/external-name: {{ $searchName }}-policy
                 gotemplating.fn.crossplane.io/composition-resource-name: search-policy
               labels:
                 app: liferay
                 component: search-policy
-              name: {{ $xr.metadata.name }}-search-policy
+              name: {{ $searchName }}-policy
             spec:
               forProvider:
                 domainNameSelector:
@@ -324,7 +325,7 @@ spec:
                         "Principal": {
                           "AWS": "arn:aws:iam::{{ $accountId }}:role/{{ $liferayServiceAccountRoleName }}"
                         },
-                        "Resource": "arn:aws:es:{{ $searchSpec.region }}:{{ $accountId }}:domain/{{ $xr.metadata.name }}-search/*"
+                        "Resource": "arn:aws:es:{{ $searchSpec.region }}:{{ $accountId }}:domain/{{ $searchName }}/*"
                       }
                     ]
                   }
@@ -333,30 +334,30 @@ spec:
             kind: SecurityGroup
             metadata:
               annotations:
-                crossplane.io/external-name: {{ $xr.metadata.name }}-search-security-group
+                crossplane.io/external-name: {{ $searchName }}-security-group
                 gotemplating.fn.crossplane.io/composition-resource-name: search-security-group
               labels:
                 app: liferay
                 component: search-security-group
-              name: {{ $xr.metadata.name }}-search-security-group
+              name: {{ $searchName }}-security-group
             spec:
               forProvider:
-                name: {{ $xr.metadata.name }}-search-security-group
+                name: {{ $searchName }}-security-group
                 region: {{ $searchSpec.region }}
                 tags:
-                  Name: {{ $xr.metadata.name }}-search-security-group
+                  Name: {{ $searchName }}-security-group
                 vpcId: {{ $vpcId }}
             ---
             apiVersion: ec2.aws.m.upbound.io/v1beta1
             kind: SecurityGroupIngressRule
             metadata:
               annotations:
-                crossplane.io/external-name: {{ $xr.metadata.name }}-search-security-group-ingress
+                crossplane.io/external-name: {{ $searchName }}-security-group-ingress
                 gotemplating.fn.crossplane.io/composition-resource-name: search-security-group-ingress
               labels:
                 app: liferay
                 component: search-security-group-ingress
-              name: {{ $xr.metadata.name }}-search-security-group-ingress
+              name: {{ $searchName }}-security-group-ingress
             spec:
               forProvider:
                 fromPort: 443
