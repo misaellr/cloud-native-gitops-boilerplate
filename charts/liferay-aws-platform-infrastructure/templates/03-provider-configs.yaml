@@ -29,4 +29,6 @@ metadata:
   name: default
 spec:
   credentials:
-    - source: IRSA
+    - fs:
+        path: /var/run/secrets/eks.amazonaws.com/serviceaccount/token
+      source: Filesystem
