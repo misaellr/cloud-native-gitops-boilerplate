@@ -28,6 +28,20 @@ metadata:
     argocd.argoproj.io/sync-wave: "-70"
   name: default
 spec:
+  configuration: |
+    terraform {
+      backend "kubernetes" {
+        secret_suffix="opentofu-search-pw"
+        namespace="crossplane-system"
+        in_cluster_config=true
+      }
+      required_providers {
+        random={
+          source ="hashicorp/random"
+          version="~> 3.0"
+        }
+      }
+    }
   credentials:
     - filename: irsa-token.jwt
       fs:
