@@ -48,6 +48,16 @@ liferay-default:
   portalProperties: |
     com.liferay.portal.servlet.filters.secure.SecureFilter=true
     com.liferay.portal.upload.UploadServletRequestImpl.max.size=0
+
+    liferay.search.engine.id=opensearch
+    hibernate.dialect=com.liferay.portal.dao.orm.hibernate.PostgreSQLDialect
+
+    dl.store.impl=com.liferay.portal.store.s3.S3Store
+    jdbc.default.driverClassName=org.postgresql.Driver
+    jdbc.default.password=${env.DATABASE_PASSWORD}
+    jdbc.default.url=jdbc:postgresql://${env.DATABASE_ENDPOINT}:${env.DATABASE_PORT}/lportal?useUnicode=true&characterEncoding=UTF-8&useFastDateParsing=false
+    jdbc.default.username=${env.DATABASE_USERNAME}
+
     proxy.forwarded.for.header=X-Forwarded-For
     proxy.forwarded.host.header=X-Forwarded-Host
     proxy.forwarded.proto.header=X-Forwarded-Proto
@@ -57,13 +67,6 @@ liferay-default:
     web.server.http.port=80
     web.server.https.port=443
     web.server.protocol=http
-  resources:
-    limits:
-      cpu: 4000m
-      memory: 12Gi
-    requests:
-      cpu: 2000m
-      memory: 4Gi
   volumeClaimTemplates:
     - apiVersion: v1	
       kind: PersistentVolumeClaim	
