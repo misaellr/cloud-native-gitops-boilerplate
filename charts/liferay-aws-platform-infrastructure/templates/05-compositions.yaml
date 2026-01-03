@@ -245,7 +245,7 @@ spec:
             kind: Domain
             metadata:
               annotations:
-                crossplane.io/external-name: {{ $searchName }}
+                crossplane.io/external-name: arn:aws:es:{{ $searchSpec.region }}:{{ $accountId }}:domain/{{ $searchName }}
                 gotemplating.fn.crossplane.io/composition-resource-name: search
               labels:
                 app: liferay
