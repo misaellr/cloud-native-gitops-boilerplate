@@ -302,7 +302,6 @@ spec:
             kind: DomainPolicy
             metadata:
               annotations:
-                crossplane.io/external-name: {{ $searchName }}-policy
                 gotemplating.fn.crossplane.io/composition-resource-name: search-policy
               labels:
                 app: liferay
