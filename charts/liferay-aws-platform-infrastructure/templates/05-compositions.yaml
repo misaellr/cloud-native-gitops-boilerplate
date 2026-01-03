@@ -340,6 +340,13 @@ spec:
               forProvider:
                 source: Inline
                 module: |
+                  terraform {
+                    required_providers {
+                      random={
+                        source="hashicorp/random"
+                      }
+                    }
+                  }
                   resource "random_password" "password" {
                     length=20
                     min_lower=1
