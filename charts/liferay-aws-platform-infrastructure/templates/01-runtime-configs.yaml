@@ -26,6 +26,15 @@ spec:
                   memory: 1Gi
                 requests:
                   memory: 512Mi
+              env:
+                - name: AWS_WEB_IDENTITY_TOKEN_FILE
+                  value: /var/run/secrets/eks.amazonaws.com/serviceaccount/token
+                - name: AWS_ROLE_ARN
+                  value: arn:aws:iam::{{ $accountId }}:role/{{ $cluster }}-provider-opentofu-role
+                - name: TF_DATA_DIR
+                  value: /tmp/data
+                - name: TF_IN_AUTOMATION
+                  value: "true"
           serviceAccountName: provider-opentofu
   serviceAccountTemplate:
     metadata:
