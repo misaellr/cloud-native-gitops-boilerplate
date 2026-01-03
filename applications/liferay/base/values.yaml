@@ -1,29 +1,4 @@
 liferay-default:
-  configmap:
-    annotations:
-      argocd.argoproj.io/compare-options: IgnoreExtraneous
-      argocd.argoproj.io/sync-options: Prune=false
-  customInitContainers:
-    x-liferay-prewipe-hypersonic:
-      - containerTemplate: |
-          - command:
-              - bash
-              - -c
-              - |
-                  FLAGFILE=/opt/liferay/data/.hypersonic.prewiped
-
-                  if [ ! -e "${FLAGFILE}" ]
-                  then
-                    rm -rf /opt/liferay/data/hypersonic
-
-                    touch "${FLAGFILE}"
-                  fi
-            image: {{ printf "%s:%s" .image.repository (.image.tag | toString) }}
-            imagePullPolicy: {{ .image.pullPolicy }}
-            name: liferay-prewipe-hypersonic
-            volumeMounts:
-              - mountPath: /opt
-                name: liferay-persistent-volume
   image:
     tag: 2025.q1.20-lts
   ingress:
