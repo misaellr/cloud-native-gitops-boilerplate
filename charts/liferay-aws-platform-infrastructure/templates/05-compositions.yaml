@@ -311,11 +311,7 @@ spec:
               namespace: {{ $xr.metadata.namespace }}
             spec:
               forProvider:
-                domainNameSelector:
-                  matchLabels:
-                    app: liferay
-                    component: search
-                  namespace: {{ $xr.metadata.namespace }}
+                domainName: {{ $searchName }}
                 region: {{ $searchSpec.region }}
                 accessPolicies: |
                   {
