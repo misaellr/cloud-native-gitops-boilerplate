@@ -86,10 +86,8 @@ spec:
                 app: liferay
                 component: database-security-group
                 slot: {{ $slot }}
-              name: {{ $xr.metadata.name }}-database-security-group-{{ $slot }}
             spec:
               forProvider:
-                name: {{ $xr.metadata.name }}-database-security-group-{{ $slot }}
                 region: {{ $spec.region }}
                 tags:
                   Name: {{ $xr.metadata.name }}-database-security-group-{{ $slot }}
@@ -104,7 +102,6 @@ spec:
                 app: liferay
                 component: database-security-group-ingress
                 slot: {{ $slot }}
-              name: {{ $xr.metadata.name }}-database-security-group-ingress-{{ $slot }}
             spec:
               forProvider:
                 fromPort: 5432
@@ -336,10 +333,8 @@ spec:
               labels:
                 app: liferay
                 component: search-security-group
-              name: {{ $searchName }}-security-group
             spec:
               forProvider:
-                name: {{ $searchName }}-security-group
                 region: {{ $searchSpec.region }}
                 tags:
                   Name: {{ $searchName }}-security-group
@@ -353,7 +348,6 @@ spec:
               labels:
                 app: liferay
                 component: search-security-group-ingress
-              name: {{ $searchName }}-security-group-ingress
             spec:
               forProvider:
                 fromPort: 443
