@@ -19,31 +19,3 @@ metadata:
 spec:
   credentials:
     source: InjectedIdentity
----
-apiVersion: opentofu.m.upbound.io/v1beta1
-kind: ClusterProviderConfig
-metadata:
-  annotations:
-    argocd.argoproj.io/sync-options: ServerSideApply=true
-    argocd.argoproj.io/sync-wave: "-70"
-  name: default
-spec:
-  configuration: |
-    terraform {
-      backend "kubernetes" {
-        secret_suffix="opentofu-search-pw"
-        namespace="crossplane-system"
-        in_cluster_config=true
-      }
-      required_providers {
-        random={
-          source ="hashicorp/random"
-          version="~> 3.0"
-        }
-      }
-    }
-  credentials:
-    - filename: irsa-token.jwt
-      fs:
-        path: /var/run/secrets/eks.amazonaws.com/serviceaccount/token
-      source: Filesystem

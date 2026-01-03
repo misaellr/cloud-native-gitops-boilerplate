@@ -7,49 +7,6 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-options: ServerSideApply=true
     argocd.argoproj.io/sync-wave: "-90"
-  name: opentofu-config
-spec:
-  deploymentTemplate:
-    spec:
-      selector:
-        matchLabels:
-          pkg.crossplane.io/provider: provider-opentofu
-      template:
-        metadata:
-          labels:
-            pkg.crossplane.io/provider: provider-opentofu
-        spec:
-          containers:
-            - name: package-runtime
-              resources:
-                limits:
-                  memory: 1Gi
-                requests:
-                  memory: 512Mi
-              env:
-                - name: AWS_WEB_IDENTITY_TOKEN_FILE
-                  value: /var/run/secrets/eks.amazonaws.com/serviceaccount/token
-                - name: AWS_ROLE_ARN
-                  value: arn:aws:iam::{{ $accountId }}:role/{{ $cluster }}-provider-opentofu-role
-                - name: TF_DATA_DIR
-                  value: /tmp/data
-                - name: TF_IN_AUTOMATION
-                  value: "true"
-          serviceAccountName: provider-opentofu
-  serviceAccountTemplate:
-    metadata:
-      annotations:
-        eks.amazonaws.com/role-arn: arn:aws:iam::{{ $accountId }}:role/{{ $cluster }}-provider-opentofu-role
-      labels:
-        app.kubernetes.io/managed-by: liferay-infrastructure-chart
-      name: provider-opentofu
----
-apiVersion: pkg.crossplane.io/v1beta1
-kind: DeploymentRuntimeConfig
-metadata:
-  annotations:
-    argocd.argoproj.io/sync-options: ServerSideApply=true
-    argocd.argoproj.io/sync-wave: "-90"
   name: kubernetes-config
 spec:
   deploymentTemplate:
