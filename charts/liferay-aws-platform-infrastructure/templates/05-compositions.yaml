@@ -342,7 +342,7 @@ spec:
             spec:
               forProvider:
                 name: {{ $xr.metadata.name }}-search-security-group
-                region: {{ $spec.region }}
+                region: {{ $searchSpec.region }}
                 tags:
                   Name: {{ $xr.metadata.name }}-search-security-group
                 vpcId: {{ $vpcId }}
@@ -363,7 +363,7 @@ spec:
                 ipProtocol: tcp
                 toPort: 443
                 referencedSecurityGroupId: {{ $nodesSecurityGroupId }}
-                region: {{ $spec.region }}
+                region: {{ $searchSpec.region }}
                 securityGroupIdSelector:
                   matchLabels:
                     app: liferay
