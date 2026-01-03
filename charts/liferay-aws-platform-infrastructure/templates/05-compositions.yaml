@@ -81,7 +81,6 @@ spec:
             kind: SecurityGroup
             metadata:
               annotations:
-                crossplane.io/external-name: {{ $xr.metadata.name }}-database-security-group-{{ $slot }}
                 gotemplating.fn.crossplane.io/composition-resource-name: database-security-group-{{ $slot }}
               labels:
                 app: liferay
@@ -100,7 +99,6 @@ spec:
             kind: SecurityGroupIngressRule
             metadata:
               annotations:
-                crossplane.io/external-name: {{ $xr.metadata.name }}-database-security-group-ingress-{{ $slot }}
                 gotemplating.fn.crossplane.io/composition-resource-name: database-security-group-ingress-{{ $slot }}
               labels:
                 app: liferay
@@ -216,7 +214,7 @@ spec:
                           "arn:aws:s3:::{{ $xr.metadata.name }}-storage-{{ $slot }}",
                           "arn:aws:s3:::{{ $xr.metadata.name }}-storage-{{ $slot }}/*"
                         ]
-                      },
+                      }
                     ]
                     "Version": "2012-10-17"
                   }
@@ -334,7 +332,6 @@ spec:
             kind: SecurityGroup
             metadata:
               annotations:
-                crossplane.io/external-name: {{ $searchName }}-security-group
                 gotemplating.fn.crossplane.io/composition-resource-name: search-security-group
               labels:
                 app: liferay
@@ -352,7 +349,6 @@ spec:
             kind: SecurityGroupIngressRule
             metadata:
               annotations:
-                crossplane.io/external-name: {{ $searchName }}-security-group-ingress
                 gotemplating.fn.crossplane.io/composition-resource-name: search-security-group-ingress
               labels:
                 app: liferay
