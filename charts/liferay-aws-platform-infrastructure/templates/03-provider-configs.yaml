@@ -29,6 +29,7 @@ metadata:
   name: default
 spec:
   credentials:
-    - fs:
+    - filename: irsa-token.jwt
+      fs:
         path: /var/run/secrets/eks.amazonaws.com/serviceaccount/token
       source: Filesystem
