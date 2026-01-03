@@ -50,6 +50,8 @@ spec:
               forProvider:
                 allocatedStorage: {{ $spec.storageGB }}
                 autoGeneratePassword: true
+                backupRetentionPeriod: 7
+                dbName: lportal
                 dbSubnetGroupNameSelector:
                   matchLabels:
                     app: liferay
@@ -59,11 +61,13 @@ spec:
                 engineVersion: "16.11"
                 identifier: {{ $xr.metadata.name }}-database-{{ $slot }}
                 instanceClass: {{ $spec.instanceClass }}
+                multiAz: false
                 passwordSecretRef:
                   key: password
                   name: liferay-database-{{ $slot }}-password
                 region: {{ $spec.region }}
                 skipFinalSnapshot: true
+                storageType: gp3
                 username: {{ $spec.username }}
                 vpcSecurityGroupIdSelector:
                   matchLabels:
