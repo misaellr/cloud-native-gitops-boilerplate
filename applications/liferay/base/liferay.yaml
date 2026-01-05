@@ -1,6 +1,6 @@
 liferay-default:
   image:
-    tag: 2025.q1.20-lts
+    tag: 2025.q1.20-lts-slim
   ingress:
     annotations:
       nginx.ingress.kubernetes.io/affinity: "cookie"
