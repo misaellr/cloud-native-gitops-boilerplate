@@ -8,7 +8,7 @@
 {{- $storageGreen := $storage.green | default dict -}}
 
 apiVersion: aws.liferay.com/v1alpha1
-kind: LiferayDependencies
+kind: LiferayInfrastructure
 metadata:
   annotations:
     argocd.argoproj.io/sync-options: ServerSideApply=true

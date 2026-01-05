@@ -3,11 +3,11 @@ kind: Composition
 metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "-50"
-  name: liferay-aws-platform-infrastructure.aws.liferay.com
+  name: liferay-aws-infrastructure-provider.aws.liferay.com
 spec:
   compositeTypeRef:
     apiVersion: aws.liferay.com/v1alpha1
-    kind: LiferayDependencies
+    kind: LiferayInfrastructure
   mode: Pipeline
   pipeline:
     - step: liferay-infrastructure
