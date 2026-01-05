@@ -489,7 +489,7 @@ spec:
                     DATABASE_PASSWORD: {{ $database.connectionDetails.password | default "" | b64dec | toString }}
                     DATABASE_PORT: {{ $databasePort | default 5432 | quote }}
                     DATABASE_USERNAME: {{ $database.resource.spec.forProvider.username | toString }}
-                    OPENSEARCH_ENDPOINT: "https://{{ $searchEndpoint }}"
+                    OPENSEARCH_ENDPOINT: {{ $searchEndpoint | toString }}
                     OPENSEARCH_PASSWORD: {{ $searchPassword | default "" | b64dec | toString }}
                     OPENSEARCH_USERNAME: {{ $search.resource.spec.forProvider.advancedSecurityOptions.masterUserOptions.masterUserName | toString }}
                     S3_BUCKET_ID: {{ $storageName | toString }}
