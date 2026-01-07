@@ -16,6 +16,9 @@ metadata:
   name: {{ .Release.Name }}
   namespace: {{ .Release.Namespace }}
 spec:
+  commonTags:
+    EnvironmentId: {{ .Values.environmentId }}
+    ProjectId: {{ .Values.projectId }}
   database:
     activeSlot: {{ default "blue" $db.activeSlot | quote }}
     blue:
@@ -28,8 +31,9 @@ spec:
       username: {{ $dbGreen.username | default "liferay_database_admin" | quote }}
       region: {{ $dbGreen.region | default "us-west-2" | quote }}
       storageGB: {{ $dbGreen.storageGB | default 20 }}
-  deletionProtection: {{- $.Values.deletionProtection | default false -}}
-  projectId: {{- $.Values.projectId | default "default" | quote -}}
+  deletionProtection: {{ .Values.deletionProtection | default false }}
+  environmentId: {{ .Values.environmentId }}
+  projectId: {{ .Values.projectId }}
   search:
     engineVersion: {{ $search.engineVersion | default "OpenSearch_2.15" | quote }}
     instanceCount: {{ $search.instanceCount | default 2 }}

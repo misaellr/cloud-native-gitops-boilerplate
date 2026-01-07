@@ -17,6 +17,10 @@ spec:
           properties:
             spec:
               properties:
+                commonTags:
+                  additionalProperties: true
+                  default: {}
+                  type: object
                 database:
                   properties:
                     activeSlot:
@@ -65,9 +69,10 @@ spec:
                 deletionProtection:
                   type: boolean
                   default: false
+                environmentId:
+                  type: string
                 projectId:
                   type: string
-                  default: ""
                 search:
                   properties:
                     engineVersion:
@@ -124,6 +129,7 @@ spec:
               required:
                 - database
                 - deletionProtection
+                - environmentId
                 - projectId
                 - search
                 - storage

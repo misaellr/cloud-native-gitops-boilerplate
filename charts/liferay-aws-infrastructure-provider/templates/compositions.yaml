@@ -27,11 +27,16 @@ spec:
             {{- $privateSubnetIds := `}}{{ .Values.aws.privateSubnetIds | quote }}{{` -}}
 
             {{- $xr := .observed.composite.resource -}}
+            {{- $namespace := $xr.metadata.namespace -}}
+            {{- $environmentId := $xr.spec.environmentId -}}
+            {{- $projectId := $xr.spec.projectId -}}
+            {{- $projectIdFull := printf "%s-%s" $projectId $environmentId -}}
+            {{- $uidHash := printf "%s-%s" $accountId $projectIdFull | sha256sum | trunc 6 -}}
+            {{- $baseName := printf "%.18s-%s" $projectIdFull $uidHash -}}
 
             {{- $managementPolicies := $xr.spec.deletionProtection | ternary (list "Create" "Observe" "Update") (list "*") | toJson -}}
             {{- $managementPoliciesNoUpdate := $xr.spec.deletionProtection | ternary (list "Create" "Observe") (list "Create" "Delete" "Observe") | toJson -}}
             {{- $privateSubnetIdsList := $privateSubnetIds | fromJson -}}
-            {{- $projectId := $xr.spec.projectId -}}
 
             {{- $databaseSpec := $xr.spec.database }}
             {{- $databaseSlots := dict "blue" $databaseSpec.blue "green" $databaseSpec.green -}}
@@ -42,14 +47,16 @@ spec:
             kind: Instance
             metadata:
               annotations:
-                crossplane.io/external-name: {{ $xr.metadata.name }}-database-{{ $slot }}
+                crossplane.io/external-name: {{ $baseName }}-database-{{ $slot }}
                 gotemplating.fn.crossplane.io/composition-resource-name: database-{{ $slot }}
               labels:
                 app: liferay
                 component: database
+                environmentId: {{ $environmentId }}
+                projectId: {{ $projectId }}
                 slot: {{ $slot }}
-              name: {{ $xr.metadata.name }}-database-{{ $slot }}
-              namespace: {{ $xr.metadata.namespace }}
+              name: {{ $baseName }}-database-{{ $slot }}
+              namespace: {{ $namespace }}
             spec:
               forProvider:
                 allocatedStorage: {{ $spec.storageGB }}
@@ -63,7 +70,7 @@ spec:
                     slot: {{ $slot }}
                 engine: postgres
                 engineVersion: "16.11"
-                identifier: {{ $xr.metadata.name }}-database-{{ $slot }}
+                identifier: {{ $baseName }}-database-{{ $slot }}
                 instanceClass: {{ $spec.instanceClass }}
                 multiAz: false
                 passwordSecretRef:
@@ -81,7 +88,7 @@ spec:
                 tags:
                   Active: {{ printf "%t" (eq $slot $databaseSpec.activeSlot) }}
                   Backup: true
-                  Name: {{ $xr.metadata.name }}-database-{{ $slot }}
+                  Name: {{ $baseName }}-database-{{ $slot }}
               managementPolicies: {{ $managementPolicies }}
               writeConnectionSecretToRef:
                 name: liferay-database-{{ $slot }}-credentials
@@ -94,13 +101,15 @@ spec:
               labels:
                 app: liferay
                 component: database-security-group
+                environmentId: {{ $environmentId }}
+                projectId: {{ $projectId }}
                 slot: {{ $slot }}
-              namespace: {{ $xr.metadata.namespace }}
+              namespace: {{ $namespace }}
             spec:
               forProvider:
                 region: {{ $spec.region }}
                 tags:
-                  Name: {{ $xr.metadata.name }}-database-security-group-{{ $slot }}
+                  Name: {{ $baseName }}-database-security-group-{{ $slot }}
                 vpcId: {{ $vpcId }}
               managementPolicies: {{ $managementPolicies }}
             ---
@@ -112,8 +121,10 @@ spec:
               labels:
                 app: liferay
                 component: database-security-group-ingress
+                environmentId: {{ $environmentId }}
+                projectId: {{ $projectId }}
                 slot: {{ $slot }}
-              namespace: {{ $xr.metadata.namespace }}
+              namespace: {{ $namespace }}
             spec:
               forProvider:
                 fromPort: 5432
@@ -132,23 +143,26 @@ spec:
             kind: SubnetGroup
             metadata:
               annotations:
-                crossplane.io/external-name: {{ $xr.metadata.name }}-database-subnet-group-{{ $slot }}
+                crossplane.io/external-name: {{ $baseName }}-database-subnet-group-{{ $slot }}
                 gotemplating.fn.crossplane.io/composition-resource-name: database-subnet-group-{{ $slot }}
               labels:
                 app: liferay
                 component: database-subnet-group
+                environmentId: {{ $environmentId }}
+                projectId: {{ $projectId }}
                 slot: {{ $slot }}
-              name: {{ $xr.metadata.name }}-database-subnet-group-{{ $slot }}
-              namespace: {{ $xr.metadata.namespace }}
+              name: {{ $baseName }}-database-subnet-group-{{ $slot }}
+              namespace: {{ $namespace }}
             spec:
               forProvider:
                 region: {{ $spec.region }}
                 subnetIds: {{ $privateSubnetIdsList | toJson }}
                 tags:
-                  Name: {{ $xr.metadata.name }}-database-{{ $slot }}-subnets
+                  Name: {{ $baseName }}-database-{{ $slot }}-subnets
               managementPolicies: {{ $managementPolicies }}
             {{- end }}
 
+            {{- $storageName := printf "%s-%s-storage" $accountId $baseName -}}
             {{- $storageSpec := $xr.spec.storage }}
             {{- $storageSlots := dict "blue" $storageSpec.blue "green" $storageSpec.green -}}
 
@@ -158,35 +172,35 @@ spec:
             kind: Bucket
             metadata:
               annotations:
-                crossplane.io/external-name: {{ $xr.metadata.name }}-storage-{{ $slot }}
+                crossplane.io/external-name: {{ $storageName }}-{{ $slot }}
                 gotemplating.fn.crossplane.io/composition-resource-name: storage-{{ $slot }}
               labels:
                 app: liferay
                 component: storage
+                environmentId: {{ $environmentId }}
+                projectId: {{ $projectId }}
                 slot: {{ $slot }}
-              name: {{ $xr.metadata.name }}-storage-{{ $slot }}
-              namespace: {{ $xr.metadata.namespace }}
+              name: {{ $storageName }}-{{ $slot }}
+              namespace: {{ $namespace }}
             spec:
               forProvider:
                 region: {{ $spec.region }}
                 tags:
                   Active: {{ printf "%t" (eq $slot $storageSpec.activeSlot) }}
                   Backup: true
-                  Name: {{ $xr.metadata.name }}-storage-{{ $slot }}
+                  Name: {{ $storageName }}-{{ $slot }}
               managementPolicies: {{ $managementPolicies }}
             ---
             apiVersion: s3.aws.m.upbound.io/v1beta1
-            kind: BucketVersioning
+            kind: BucketLifecycleConfiguration
             metadata:
               annotations:
-                crossplane.io/external-name: {{ $xr.metadata.name }}-storage-versioning-{{ $slot }}
-                gotemplating.fn.crossplane.io/composition-resource-name: storage-versioning-{{ $slot }}
+                crossplane.io/external-name: {{ $storageName }}-lifecycle-{{ $slot }}
+                gotemplating.fn.crossplane.io/composition-resource-name: storage-lifecycle-{{ $slot }}
               labels:
-                app: liferay
-                component: storage-versioning
-                slot: {{ $slot }}
-              name: {{ $xr.metadata.name }}-storage-versioning-{{ $slot }}
-              namespace: {{ $xr.metadata.namespace }}
+                environmentId: {{ $environmentId }}
+                projectId: {{ $projectId }}
+              name: {{ $storageName }}-lifecycle-{{ $slot }}
             spec:
               forProvider:
                 bucketSelector:
@@ -194,7 +208,60 @@ spec:
                     app: liferay
                     component: storage
                     slot: {{ $slot }}
-                  namespace: {{ $xr.metadata.namespace }}
+                region: {{ $spec.region }}
+                rule:
+                  - abortIncompleteMultipartUpload:
+                      - daysAfterInitiation: 7
+                    id: abort-incomplete-multipart-upload
+                    status: Enabled
+              managementPolicies: {{ $managementPolicies }}
+            ---
+            apiVersion: s3.aws.m.upbound.io/v1beta1
+            kind: BucketPublicAccessBlock
+            metadata:
+              annotations:
+                crossplane.io/external-name: {{ $storageName }}-public-access-block-{{ $slot }}
+                gotemplating.fn.crossplane.io/composition-resource-name: storage-public-access-block-{{ $slot }}
+              labels:
+                environmentId: {{ $environmentId }}
+                projectId: {{ $projectId }}
+              name: {{ $storageName }}-public-access-block-{{ $slot }}
+            spec:
+              forProvider:
+                blockPublicAcls: true
+                blockPublicPolicy: true
+                bucketSelector:
+                  matchLabels:
+                    app: liferay
+                    component: storage
+                    slot: {{ $slot }}
+                ignorePublicAcls: true
+                region: {{ $spec.region }}
+                restrictPublicBuckets: true
+              managementPolicies: {{ $managementPolicies }}
+            ---
+            apiVersion: s3.aws.m.upbound.io/v1beta1
+            kind: BucketVersioning
+            metadata:
+              annotations:
+                crossplane.io/external-name: {{ $storageName }}-versioning-{{ $slot }}
+                gotemplating.fn.crossplane.io/composition-resource-name: storage-versioning-{{ $slot }}
+              labels:
+                app: liferay
+                component: storage-versioning
+                environmentId: {{ $environmentId }}
+                projectId: {{ $projectId }}
+                slot: {{ $slot }}
+              name: {{ $storageName }}-versioning-{{ $slot }}
+              namespace: {{ $namespace }}
+            spec:
+              forProvider:
+                bucketSelector:
+                  matchLabels:
+                    app: liferay
+                    component: storage
+                    slot: {{ $slot }}
+                  namespace: {{ $namespace }}
                 region: {{ $spec.region }}
                 versioningConfiguration:
                   status: Enabled
@@ -204,14 +271,16 @@ spec:
             kind: Policy
             metadata:
               annotations:
-                crossplane.io/external-name: {{ $xr.metadata.name }}-storage-policy-{{ $slot }}
+                crossplane.io/external-name: {{ $storageName }}-policy-{{ $slot }}
                 gotemplating.fn.crossplane.io/composition-resource-name: storage-policy-{{ $slot }}
               labels:
                 app: liferay
                 component: storage-policy
+                environmentId: {{ $environmentId }}
+                projectId: {{ $projectId }}
                 slot: {{ $slot }}
-              name: {{ $xr.metadata.name }}-storage-policy-{{ $slot }}
-              namespace: {{ $xr.metadata.namespace }}
+              name: {{ $storageName }}-policy-{{ $slot }}
+              namespace: {{ $namespace }}
             spec:
               forProvider:
                 policy: |
@@ -226,8 +295,8 @@ spec:
                         ],
                         "Effect": "Allow",
                         "Resource": [
-                          "arn:aws:s3:::{{ $xr.metadata.name }}-storage-{{ $slot }}",
-                          "arn:aws:s3:::{{ $xr.metadata.name }}-storage-{{ $slot }}/*"
+                          "arn:aws:s3:::{{ $storageName }}-{{ $slot }}",
+                          "arn:aws:s3:::{{ $storageName }}-{{ $slot }}/*"
                         ]
                       }
                     ],
@@ -239,14 +308,16 @@ spec:
             kind: RolePolicyAttachment
             metadata:
               annotations:
-                crossplane.io/external-name: {{ $xr.metadata.name }}-storage-policy-attachment-{{ $slot }}
+                crossplane.io/external-name: {{ $storageName }}-policy-attachment-{{ $slot }}
                 gotemplating.fn.crossplane.io/composition-resource-name: storage-policy-attachment-{{ $slot }}
               labels:
                 app: liferay
                 component: storage-policy-attachment
+                environmentId: {{ $environmentId }}
+                projectId: {{ $projectId }}
                 slot: {{ $slot }}
-              name: {{ $xr.metadata.name }}-storage-policy-attachment-{{ $slot }}
-              namespace: {{ $xr.metadata.namespace }}
+              name: {{ $storageName }}-policy-attachment-{{ $slot }}
+              namespace: {{ $namespace }}
             spec:
               forProvider:
                 policyArnSelector:
@@ -258,8 +329,7 @@ spec:
               managementPolicies: {{ $managementPolicies }}
             {{- end }}
 
-            {{- $searchUidHash := printf "%s-%s" $projectId $xr.metadata.name | sha256sum | trunc 6 -}}
-            {{- $searchName := printf "%.15s-%s-search" $xr.metadata.name $searchUidHash -}}
+            {{- $searchName := printf "%.21s-search" $baseName -}}
             {{- $searchSpec := $xr.spec.search }}
 
             ---
@@ -272,8 +342,10 @@ spec:
               labels:
                 app: liferay
                 component: search
+                environmentId: {{ $environmentId }}
+                projectId: {{ $projectId }}
               name: {{ $searchName }}
-              namespace: {{ $xr.metadata.namespace }}
+              namespace: {{ $namespace }}
             spec:
               forProvider:
                 domainName: {{ $searchName }}
@@ -324,8 +396,10 @@ spec:
               labels:
                 app: liferay
                 component: search-policy
+                environmentId: {{ $environmentId }}
+                projectId: {{ $projectId }}
               name: {{ $searchName }}-policy
-              namespace: {{ $xr.metadata.namespace }}
+              namespace: {{ $namespace }}
             spec:
               forProvider:
                 domainName: {{ $searchName }}
@@ -350,21 +424,28 @@ spec:
             kind: Object
             metadata:
               annotations:
-                crossplane.io/external-name: {{ $xr.metadata.name }}-search-password-secret
+                crossplane.io/external-name: {{ $baseName }}-search-password-secret
                 gotemplating.fn.crossplane.io/composition-resource-name: search-password-secret
               labels:
                 app: liferay
                 component: search-password-secret
+                environmentId: {{ $environmentId }}
+                projectId: {{ $projectId }}
               name: {{ $searchName }}-password-secret
-              namespace: {{ $xr.metadata.namespace }}
+              namespace: {{ $namespace }}
             spec:
               forProvider:
                 manifest:
                   apiVersion: v1
                   kind: Secret
                   metadata:
+                    labels:
+                      app: liferay
+                      component: search-password-secret
+                      environmentId: {{ $environmentId }}
+                      projectId: {{ $projectId }}
                     name: liferay-search-password
-                    namespace: {{ $xr.metadata.namespace }}
+                    namespace: {{ $namespace }}
                   type: Opaque
                   stringData:
                     password: {{ print (randAlphaNum 16) "7bQZ!#%_+" | shuffle }}
@@ -378,7 +459,9 @@ spec:
               labels:
                 app: liferay
                 component: search-security-group
-              namespace: {{ $xr.metadata.namespace }}
+                environmentId: {{ $environmentId }}
+                projectId: {{ $projectId }}
+              namespace: {{ $namespace }}
             spec:
               forProvider:
                 region: {{ $searchSpec.region }}
@@ -395,7 +478,9 @@ spec:
               labels:
                 app: liferay
                 component: search-security-group-ingress
-              namespace: {{ $xr.metadata.namespace }}
+                environmentId: {{ $environmentId }}
+                projectId: {{ $projectId }}
+              namespace: {{ $namespace }}
             spec:
               forProvider:
                 fromPort: 443
@@ -485,21 +570,28 @@ spec:
             kind: Object
             metadata:
               annotations:
-                crossplane.io/external-name: {{ $xr.metadata.name }}-managed-service-details-secret
+                crossplane.io/external-name: {{ $baseName }}-managed-service-details-secret
                 gotemplating.fn.crossplane.io/composition-resource-name: managed-service-details-secret
               labels:
                 app: liferay
                 component: managed-service-details-secret
-              name: {{ $xr.metadata.name }}-managed-service-details-secret
-              namespace: {{ $xr.metadata.namespace }}
+                environmentId: {{ $environmentId }}
+                projectId: {{ $projectId }}
+              name: {{ $baseName }}-managed-service-details-secret
+              namespace: {{ $namespace }}
             spec:
               forProvider:
                 manifest:
                   apiVersion: v1
                   kind: Secret
                   metadata:
+                    labels:
+                      app: liferay
+                      component: managed-service-details-secret
+                      environmentId: {{ $environmentId }}
+                      projectId: {{ $projectId }}
                     name: managed-service-details
-                    namespace: {{ $xr.metadata.namespace }}
+                    namespace: {{ $namespace }}
                   type: Opaque
                   stringData:
                     DATABASE_ENDPOINT: {{ $databaseAddress | toString }}
@@ -519,6 +611,8 @@ spec:
         name: function-tag-manager
       input:
         addTags:
+          - fromFieldPath: spec.commonTags
+            type: FromCompositeFieldPath
           - tags:
               DeploymentName: {{ .Values.deploymentName }}
             type: FromValue
