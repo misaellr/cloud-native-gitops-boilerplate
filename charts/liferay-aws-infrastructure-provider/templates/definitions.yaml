@@ -3,7 +3,7 @@ kind: CompositeResourceDefinition
 metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "-60"
-  name: liferayinfrastructure.aws.liferay.com
+  name: liferayinfrastructures.aws.liferay.com
 spec:
   group: aws.liferay.com
   names:
