@@ -16,6 +16,8 @@ spec:
           pkg.crossplane.io/provider: provider-kubernetes
       template:
         metadata:
+          annotations:
+            sidecar.opentelemetry.io/inject: "false"
           labels:
             pkg.crossplane.io/provider: provider-kubernetes
         spec:
@@ -48,6 +50,8 @@ spec:
           pkg.crossplane.io/provider: provider-aws-ec2
       template:
         metadata:
+          annotations:
+            sidecar.opentelemetry.io/inject: "false"
           labels:
             pkg.crossplane.io/provider: provider-aws-ec2
         spec:
@@ -80,6 +84,8 @@ spec:
           pkg.crossplane.io/provider: provider-aws-iam
       template:
         metadata:
+          annotations:
+            sidecar.opentelemetry.io/inject: "false"
           labels:
             pkg.crossplane.io/provider: provider-aws-iam
         spec:
@@ -112,6 +118,8 @@ spec:
           pkg.crossplane.io/provider: provider-aws-opensearch
       template:
         metadata:
+          annotations:
+            sidecar.opentelemetry.io/inject: "false"
           labels:
             pkg.crossplane.io/provider: provider-aws-opensearch
         spec:
@@ -144,6 +152,8 @@ spec:
           pkg.crossplane.io/provider: provider-aws-rds
       template:
         metadata:
+          annotations:
+            sidecar.opentelemetry.io/inject: "false"
           labels:
             pkg.crossplane.io/provider: provider-aws-rds
         spec:
@@ -176,6 +186,8 @@ spec:
           pkg.crossplane.io/provider: provider-aws-s3
       template:
         metadata:
+          annotations:
+            sidecar.opentelemetry.io/inject: "false"
           labels:
             pkg.crossplane.io/provider: provider-aws-s3
         spec:
