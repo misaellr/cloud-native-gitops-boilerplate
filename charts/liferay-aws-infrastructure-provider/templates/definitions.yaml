@@ -8,7 +8,11 @@ spec:
   group: aws.liferay.com
   names:
     kind: LiferayInfrastructure
-    plural: liferayinfrastructure
+    plural: liferayinfrastructures
+    shortNames:
+      - lfrinfra
+      - lri
+    singular: liferayinfrastructure
   versions:
     - name: v1alpha1
       referenceable: true
