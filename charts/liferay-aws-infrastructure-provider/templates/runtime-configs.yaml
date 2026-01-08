@@ -59,7 +59,7 @@ spec:
             - name: package-runtime
               resources:
                 limits:
-                  memory: 1Gi
+                  memory: 1.5Gi
                 requests:
                   memory: 256Mi
           serviceAccountName: provider-aws-ec2
@@ -93,7 +93,7 @@ spec:
             - name: package-runtime
               resources:
                 limits:
-                  memory: 256Mi
+                  memory: 512Mi
                 requests:
                   memory: 64Mi
           serviceAccountName: provider-aws-iam
@@ -127,7 +127,7 @@ spec:
             - name: package-runtime
               resources:
                 limits:
-                  memory: 512Mi
+                  memory: 768Mi
                 requests:
                   memory: 128Mi
           serviceAccountName: provider-aws-opensearch
@@ -161,7 +161,7 @@ spec:
             - name: package-runtime
               resources:
                 limits:
-                  memory: 1Gi
+                  memory: 1.5Gi
                 requests:
                   memory: 256Mi
           serviceAccountName: provider-aws-rds
