@@ -505,6 +505,13 @@ spec:
           template: |
             {{`
             {{- $xr := .observed.composite.resource -}}
+            {{- $namespace := $xr.metadata.namespace -}}
+            {{- $environmentId := $xr.spec.environmentId -}}
+            {{- $projectId := $xr.spec.projectId -}}
+            {{- $projectIdFull := printf "%s-%s" $projectId $environmentId -}}
+            {{- $uidHash := printf "%s-%s" $accountId $projectIdFull | sha256sum | trunc 6 -}}
+            {{- $baseName := printf "%.18s-%s" $projectIdFull $uidHash -}}
+
             {{- $databaseResourceName := printf "database-%s" $xr.spec.database.activeSlot -}}
             {{- $searchResourceName := "search" -}}
             {{- $storageResourceName := printf "storage-%s" $xr.spec.storage.activeSlot -}}
