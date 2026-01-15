@@ -67,6 +67,8 @@ spec:
                   matchLabels:
                     app: liferay
                     component: database-subnet-group
+                    environmentId: {{ $environmentId }}
+                    projectId: {{ $projectId }}
                     slot: {{ $slot }}
                 engine: postgres
                 engineVersion: "16.11"
