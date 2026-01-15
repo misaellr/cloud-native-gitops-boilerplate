@@ -504,7 +504,9 @@ spec:
         inline:
           template: |
             {{`
+            {{- $accountId := `}}{{ .Values.aws.accountId | quote }}{{` -}}
             {{- $xr := .observed.composite.resource -}}
+            {{- $managementPolicies := $xr.spec.deletionProtection | ternary (list "Create" "Observe" "Update") (list "*") | toJson -}}
             {{- $namespace := $xr.metadata.namespace -}}
             {{- $environmentId := $xr.spec.environmentId -}}
             {{- $projectId := $xr.spec.projectId -}}
@@ -527,9 +529,13 @@ spec:
             {{- end -}}
 
             {{- $databaseAddress := "" -}}
+            {{- $databasePassword := "" -}}
             {{- $databasePort := "" -}}
             {{- if kindIs "map" $database -}}
               {{- with $database }}
+                {{- with .connectionDetails }}
+                  {{- $databasePassword = .password | toString | b64dec -}}
+                {{- end -}}
                 {{- with .resource }}
                   {{- with .status }}
                     {{- with .atProvider }}
@@ -545,15 +551,15 @@ spec:
             {{- $searchPassword := "" -}}
             {{- if kindIs "map" $search -}}
               {{- with $search }}
+                {{- with .connectionDetails }}
+                  {{- $searchPassword = index . "attribute.advanced_security_options.0.master_user_options.0.master_user_password" | toString | b64dec -}}
+                {{- end -}}
                 {{- with .resource }}
                   {{- with .status }}
                     {{- with .atProvider }}
                       {{- $searchEndpoint = .endpoint -}}
                     {{- end -}}
                   {{- end -}}
-                {{- end -}}
-                {{- with .connectionDetails }}
-                  {{- $searchPassword = index . "attribute.advanced_security_options.0.master_user_options.0.master_user_password" | toString -}}
                 {{- end -}}
               {{- end -}}
             {{- end -}}
@@ -571,7 +577,7 @@ spec:
               {{- end -}}
             {{- end -}}
 
-            {{- if and $database.connectionDetails $databaseAddress $searchEndpoint $storageName }}
+            {{- if and $databaseAddress $databasePassword $searchEndpoint $storageName }}
             ---
             apiVersion: kubernetes.m.crossplane.io/v1alpha1
             kind: Object
@@ -602,11 +608,11 @@ spec:
                   type: Opaque
                   stringData:
                     DATABASE_ENDPOINT: {{ $databaseAddress | toString }}
-                    DATABASE_PASSWORD: {{ $database.connectionDetails.password | default "" | b64dec | toString }}
+                    DATABASE_PASSWORD: {{ $databasePassword | default "" | toString }}
                     DATABASE_PORT: {{ $databasePort | default 5432 | quote }}
                     DATABASE_USERNAME: {{ $database.resource.spec.forProvider.username | toString }}
                     OPENSEARCH_ENDPOINT: {{ $searchEndpoint | toString }}
-                    OPENSEARCH_PASSWORD: {{ $searchPassword | default "" | b64dec | toString }}
+                    OPENSEARCH_PASSWORD: {{ $searchPassword | default "" | toString }}
                     OPENSEARCH_USERNAME: {{ $search.resource.spec.forProvider.advancedSecurityOptions.masterUserOptions.masterUserName | toString }}
                     S3_BUCKET_ID: {{ $storageName | toString }}
                     S3_BUCKET_REGION: {{ $storage.resource.spec.forProvider.region | toString }}
