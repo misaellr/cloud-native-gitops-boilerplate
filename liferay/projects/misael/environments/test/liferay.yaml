@@ -54,4 +54,4 @@ liferay-default:
                     volumeMounts:
                         -   mountPath: /temp
                             name: liferay-persistent-volume
-  replicaCount: 1
+  replicaCount: 0
