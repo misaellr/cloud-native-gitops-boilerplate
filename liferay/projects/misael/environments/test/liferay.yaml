@@ -1,4 +1,6 @@
 liferay-default:
+  podAnnotations:
+    kubectl.kubernetes.io/restartedAt: "2026-01-26T02:05:00Z"
   customInitContainers:
     x-liferay-prepopulate-data:
         -   containerTemplate: |
