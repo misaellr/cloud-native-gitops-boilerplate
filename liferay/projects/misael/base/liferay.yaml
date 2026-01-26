@@ -21,6 +21,10 @@ liferay-default:
           path: /
           pathType: ImplementationSpecific
   portalProperties: |
+    jdbc.default.driverClassName=org.postgresql.Driver
+    jdbc.default.password=${env.DATABASE_PASSWORD}
+    jdbc.default.url=jdbc:postgresql://${env.DATABASE_ENDPOINT}:${env.DATABASE_PORT}/lportal?useUnicode=true&characterEncoding=UTF-8&useFastDateParsing=false
+    jdbc.default.username=${env.DATABASE_USERNAME}
     com.liferay.portal.servlet.filters.secure.SecureFilter=true
     com.liferay.portal.upload.UploadServletRequestImpl.max.size=0
     proxy.forwarded.for.header=X-Forwarded-For
