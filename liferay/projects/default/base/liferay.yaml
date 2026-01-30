@@ -1,5 +1,5 @@
 liferay-default:
-    customInitContainers:
+  customInitContainers:
     x-liferay-prepopulate-data:
         -   containerTemplate: |
                 -   command:
