@@ -5,4 +5,4 @@ search:
   opensearch:
     instanceType: r6g.large.search
     instanceCount: 2
-deletionProtection: true
+deletionProtection: false  # Workaround: chart bug missing LateInitialize in managementPolicies
