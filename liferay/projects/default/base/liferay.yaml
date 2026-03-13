@@ -120,6 +120,38 @@ liferay-default:
                       name: liferay-persistent-volume
   image:
     tag: 2025.q4.12-slim
+  startupProbe:
+    failureThreshold: 90
+    httpGet:
+      path: /c/portal/robots
+      port: http
+      httpHeaders:
+        - name: Host
+          value: localhost
+    initialDelaySeconds: 60
+    periodSeconds: 10
+    timeoutSeconds: 5
+  readinessProbe:
+    failureThreshold: 2
+    httpGet:
+      path: /c/portal/robots
+      port: http
+      httpHeaders:
+        - name: Host
+          value: localhost
+    periodSeconds: 10
+    timeoutSeconds: 5
+  livenessProbe:
+    failureThreshold: 3
+    httpGet:
+      path: /c/portal/robots
+      port: http
+      httpHeaders:
+        - name: Host
+          value: localhost
+    initialDelaySeconds: 60
+    periodSeconds: 30
+    timeoutSeconds: 5
   gateway:
     enabled: true
   ingress:
