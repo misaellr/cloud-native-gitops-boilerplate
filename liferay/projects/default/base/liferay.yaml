@@ -1,5 +1,51 @@
 liferay-default:
   customInitContainers:
+    x-liferay-install-opensearch-modules:
+      - containerTemplate: |
+          -   command:
+              -   bash
+              -   -c
+              -   |
+                  function download_module {
+                      local product_version="{{ .image.tag | toString | trimSuffix "-slim" }}"
+
+                      local url="https://releases.liferay.com/opensearch2/dxp/${product_version}/com.liferay.portal.search.opensearch2.${1}.jar"
+
+                      local http_code=$( \
+                          curl \
+                              --location \
+                              --output-dir /temp/liferay/deploy \
+                              --remote-name \
+                              --retry 5 \
+                              --retry-all-errors \
+                              --retry-delay 2 \
+                              --write-out "%{http_code}" \
+                              "${url}")
+
+                      if [ "${http_code}" != "200" ]
+                      then
+                          echo "Unable to download OpenSearch modules for product version ${product_version}." >&2
+
+                          exit 1
+                      fi
+                  }
+
+                  function main {
+                      mkdir --parents /temp/liferay/deploy
+
+                      rm --force --verbose "/temp/osgi/modules/com.liferay.portal.search.opensearch2"*
+
+                      download_module "api"
+                      download_module "impl"
+                  }
+
+                  main
+              image: {{ printf "%s:%s" .image.repository (.image.tag | toString) }}
+              imagePullPolicy: {{ .image.pullPolicy }}
+              name: liferay-install-opensearch-modules
+              volumeMounts:
+                  -   mountPath: /temp
+                      name: liferay-persistent-volume
     x-liferay-prepopulate-data:
       - containerTemplate: |
           -   command:
@@ -73,7 +119,7 @@ liferay-default:
                   -   mountPath: /temp
                       name: liferay-persistent-volume
   image:
-    tag: 2025.q4.12
+    tag: 2025.q4.12-slim
   gateway:
     enabled: true
   ingress:
