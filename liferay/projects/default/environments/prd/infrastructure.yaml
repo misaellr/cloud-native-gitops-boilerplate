@@ -1,0 +1,8 @@
+database:
+  instanceClass: db.r6g.xlarge
+  storageGB: 50
+search:
+  opensearch:
+    instanceType: r6g.large.search
+    instanceCount: 3
+deletionProtection: true

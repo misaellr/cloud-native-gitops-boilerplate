@@ -1,0 +1,3 @@
+# Infrastructure Provider values
+# Reference: Guide to Infrastructure Helm Values (cn-docs)
+# gateway.internet-facing defaults to true (internet-facing NLB)

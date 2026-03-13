@@ -1,1 +1,8 @@
-enabled: false
+enabled: true
+database:
+  region: eu-central-1
+search:
+  opensearch:
+    region: eu-central-1
+storage:
+  region: eu-central-1

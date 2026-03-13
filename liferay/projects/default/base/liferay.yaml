@@ -73,7 +73,7 @@ liferay-default:
                   -   mountPath: /temp
                       name: liferay-persistent-volume
   image:
-    tag: 2025.q1.20-lts-slim
+    tag: 2025.q4.0-lts-slim
   gateway:
     enabled: true
   ingress:
