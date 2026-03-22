@@ -5,3 +5,6 @@ liferay-default:
     forceHttpsRedirect: true
     hostnames:
       - "prd.misaelneto.com"
+  portalProperties: |
+    virtual.hosts.default.site.name=Guest
+    company.default.web.id=prd.misaelneto.com
