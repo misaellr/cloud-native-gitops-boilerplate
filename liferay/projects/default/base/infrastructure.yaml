@@ -6,3 +6,6 @@ search:
     region: eu-central-1
 storage:
   region: eu-central-1
+license:
+  externalSecretName: "liferay/licenses/misaelneto-license"
+  targetSecretName: "liferay-license"

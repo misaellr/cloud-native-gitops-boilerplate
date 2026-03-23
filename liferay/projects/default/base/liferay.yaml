@@ -51,3 +51,19 @@ liferay-default:
         volumeMounts:
           - mountPath: /temp
             name: liferay-persistent-volume
+  customEnv:
+    x-license:
+      - name: LIFERAY_DISABLE_TRIAL_LICENSE
+        value: "true"
+  customVolumeMounts:
+    x-license:
+      - mountPath: /etc/liferay/mount/files/deploy
+        name: license
+  customVolumes:
+    x-license:
+      - name: license
+        secret:
+          secretName: liferay-license
+          items:
+            - key: license.xml
+              path: license.xml
