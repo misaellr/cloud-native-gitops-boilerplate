@@ -1,4 +1,11 @@
 liferay-default:
+  resources:
+    requests:
+      cpu: "8"
+      memory: 8Gi
+    limits:
+      cpu: "8"
+      memory: 8Gi
   network:
     enabled: true
     endpointRef: misaelneto
