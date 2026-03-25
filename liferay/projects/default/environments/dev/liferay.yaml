@@ -11,10 +11,10 @@ liferay-default:
     endpointRef: misaelneto
     forceHttpsRedirect: true
     hostnames:
-      - "dev.misaelneto.com"
+      - "dev-aws.misaelneto.com"
   portalProperties: |
-    company.default.virtual.host.name=dev.misaelneto.com
-    company.default.web.id=dev.misaelneto.com
+    company.default.virtual.host.name=dev-aws.misaelneto.com
+    company.default.web.id=dev-aws.misaelneto.com
     company.default.virtual.host.mail.domain=misaelneto.com
     setup.wizard.enabled=false
     #

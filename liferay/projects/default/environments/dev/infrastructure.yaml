@@ -7,7 +7,7 @@ search:
     instanceCount: 2
 endpoints:
   misaelneto:
-    hostname: "dev.misaelneto.com"
+    hostname: "dev-aws.misaelneto.com"
     port: 443
     protocol: HTTPS
     tls:
