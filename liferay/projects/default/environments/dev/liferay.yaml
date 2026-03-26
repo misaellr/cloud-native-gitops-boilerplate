@@ -54,3 +54,16 @@ liferay-default:
     mail.session.mail.transport.protocol=smtp
     admin.email.from.name=Raymont Industries
     admin.email.from.address=no-reply@raymont.com
+  customEnv:
+    x-jmx:
+      - name: JMX_AGENT_YAML
+        value: |
+          rules:
+            - pattern: ".*"
+      - name: JMX_AGENT_PORT
+        value: "9404"
+  customPorts:
+    x-jmx:
+      - containerPort: 9404
+        name: jmx-metrics
+        protocol: TCP
